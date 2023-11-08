@@ -3,9 +3,9 @@ package com.example.javaserverapi.dto;
 import lombok.Data;
 
 @Data
-public class EmployeeVo {
+public class SecurityVo {
     long id;
     long company_id;
-    String employee_name;
-    byte[] image;
+    String room_name;
+    long access;
 }

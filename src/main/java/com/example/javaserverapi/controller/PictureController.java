@@ -17,7 +17,7 @@ public class PictureController {
     private AppError e;
     private String imagePath = "D:\\Project\\SecureScan\\pictures\\test.1"; // שינוי הנתיב למיקום התמונה במחשב
 
-    @PostMapping("/checkpicture")
+    @PostMapping("/scanpicture")
     public AppError scanPicture(@RequestBody EmployeeVo employeeVo){
         e = server.scanImage(employeeVo, imagePath);
         return e;

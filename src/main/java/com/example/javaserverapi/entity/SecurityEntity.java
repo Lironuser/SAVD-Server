@@ -6,11 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "images",schema = "public")
+@Table(name = "main",schema = "public")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class EmployeeEntity {
+public class SecurityEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -22,10 +22,10 @@ public class EmployeeEntity {
     private long company_id;
 
     @Basic(optional = false)
-    @Column(name = "employee_name")
-    private String employee_name;
+    @Column(name = "room_name")
+    private String room_name;
 
     @Basic(optional = false)
-    @Column(name = "image")
-    private byte[] image;
+    @Column(name = "access")
+    private long access;
 }

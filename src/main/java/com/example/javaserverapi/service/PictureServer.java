@@ -19,11 +19,14 @@ public class PictureServer {
     private AppError e;
     public AppError scanImage(EmployeeVo employeeVo, String string_image){
         try {
+            //url התחבר לשרת של הפייתון
             URL url = new URL("http://localhost:8085/scan");
+            //יצירת חיבור לשרת הנוסף
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            //הגדרת הבקשה
             con.setRequestMethod("POST");
 
-
+            //הופך תמונה מקובץ טקסט למערך של ביטים
             byte[] bytes_image = imageToByteArray(string_image);
 
             if (bytes_image != null) {
