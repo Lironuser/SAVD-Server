@@ -2,5 +2,5 @@ package com.example.javaserverapi.error;
 
 public enum AppError {
     GOOD,
-    UserNotFound
+    EMPLOYEE_NOT_FOUND
 }

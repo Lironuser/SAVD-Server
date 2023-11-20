@@ -14,7 +14,7 @@ import java.nio.file.Paths;
 
 
 @Service
-public class PictureServer {
+public class EmployeeServer {
 
     private AppError e;
     public AppError scanImage(EmployeeVo employeeVo, String string_image){
@@ -30,9 +30,9 @@ public class PictureServer {
             byte[] bytes_image = imageToByteArray(string_image);
 
             if (bytes_image != null) {
-                System.out.println("תמונה נקראה בהצלחה כמערך של בייטים.");
+                System.out.println("Picture transfer to byte[] successfully.");
             } else {
-                System.out.println("אירעה שגיאה בקריאת התמונה.");
+                System.out.println("Error to transfer picture to byte[].");
             }
             employeeVo.setImage(bytes_image);
 
@@ -52,10 +52,10 @@ public class PictureServer {
             con.disconnect();
 
             // המידע מהשרת ב-Python
-            System.out.println("תשובה מהשרת: " + content.toString());
+            System.out.println("Server: " + content.toString());
         } catch (Exception E) {
             E.printStackTrace();
-            return e.UserNotFound;
+            return e.EMPLOYEE_NOT_FOUND;
         }
         return e.GOOD;
     }

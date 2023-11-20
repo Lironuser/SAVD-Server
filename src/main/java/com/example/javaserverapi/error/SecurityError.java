@@ -3,7 +3,8 @@ package com.example.javaserverapi.error;
 public enum SecurityError {
 
     GOOD,
-    AccessDenied,
-    AlreadyHaveAccess,
-    OtherError
+    ACCESS_DENIED,
+    EMPLOYEE_ALREADY_HAVE_ACCESS,
+    HAVE_NO_ACCESS,
+    OTHER_ERROR
 }
