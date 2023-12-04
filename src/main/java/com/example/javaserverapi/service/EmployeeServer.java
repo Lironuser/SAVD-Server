@@ -1,75 +1,58 @@
 package com.example.javaserverapi.service;
-import com.example.javaserverapi.error.AppError;
+
 import com.example.javaserverapi.dto.EmployeeVo;
+import com.example.javaserverapi.entity.EmployeeEntity;
+import com.example.javaserverapi.error.EmployeeError;
+import com.example.javaserverapi.repository.EmployeeRepository;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
+import java.util.Optional;
 
 @Service
 public class EmployeeServer {
+    @Autowired
+    private EmployeeRepository repository;
 
-    private AppError e;
-    public AppError scanImage(EmployeeVo employeeVo, String string_image){
-        try {
-            //url התחבר לשרת של הפייתון
-            URL url = new URL("http://localhost:8085/scan");
-            //יצירת חיבור לשרת הנוסף
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            //הגדרת הבקשה
-            con.setRequestMethod("POST");
-
-            //הופך תמונה מקובץ טקסט למערך של ביטים
-            byte[] bytes_image = imageToByteArray(string_image);
-
-            if (bytes_image != null) {
-                System.out.println("Picture transfer to byte[] successfully.");
-            } else {
-                System.out.println("Error to transfer picture to byte[].");
-            }
-            employeeVo.setImage(bytes_image);
-
-            int status = con.getResponseCode();
-
-            System.out.println("HTTP Status Code: " + status);
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer content = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                content.append(inputLine);
-            }
-            in.close();
-
-            con.disconnect();
-
-            // המידע מהשרת ב-Python
-            System.out.println("Server: " + content.toString());
-        } catch (Exception E) {
-            E.printStackTrace();
-            return e.EMPLOYEE_NOT_FOUND;
+    public EmployeeError save(EmployeeVo employeeVo) {
+        Optional<EmployeeEntity> employeeEntity;
+        employeeEntity = repository.getEmployeeById(employeeVo.getId());
+        if (employeeEntity.isPresent()) {   //בודק אם קיים כבר עובד כזה
+            return EmployeeError.ALREADY_IN_SYSTEM;
         }
-        return e.GOOD;
+        try {
+            EmployeeEntity bean = new EmployeeEntity();
+            //מעתיק את המידע לשעוית לפני שאנחנו מכניסים אותה למסד המידע
+            BeanUtils.copyProperties(employeeEntity.get(), bean);
+            repository.save(bean);
+        } catch (Exception e) {
+            System.out.println(e);
+            return EmployeeError.ELSE_ERROR;
+        }
+        return EmployeeError.GOOD;
     }
 
-    public static byte[] imageToByteArray(String imagePath) {
-        byte[] imageBytes = null;
-        Path path = Paths.get(imagePath);
-
-        try {
-            imageBytes = Files.readAllBytes(path); // קריאת תמונה כמערך של בייטים
-        } catch (IOException e) {
-            e.printStackTrace();
+    public EmployeeError update(EmployeeVo employeeVo) {
+        Optional<EmployeeEntity> employeeEntity;
+        employeeEntity = repository.getEmployeeById(employeeVo.getId());
+        if (employeeEntity.isPresent()) {   //בודק אם קיים כבר עובד כזה
+            //אם לא קיים משתמש כזה אין "מה" לעדכן
+            try {
+                EmployeeEntity bean = new EmployeeEntity();
+                BeanUtils.copyProperties(employeeEntity.get(), bean);
+                // או שמדובר בכלל בתמונה בודק אם השם הנקלט שונה מהשם הקיים והאם נדרש שינוי לכתחילה
+                if (employeeVo.getEmployee_name() != null && employeeVo.getEmployee_name() != bean.getEmployee_name() || employeeVo.getImage() != null) {
+                    bean.setEmployee_name(employeeVo.getEmployee_name());
+                    bean.setImage(employeeVo.getImage());
+                }
+                repository.save(bean);  //שמירה של הנתונים החדשים
+            } catch (Exception e) {
+                System.out.println(e);
+                return EmployeeError.ELSE_ERROR;
+            }
+            return EmployeeError.GOOD;
         }
-
-        return imageBytes;
+        return EmployeeError.NOT_FOUND;
     }
 }
