@@ -1,7 +1,8 @@
 package com.example.javaserverapi.controller;
 
-import com.example.javaserverapi.dto.EmployeeVo;
-import com.example.javaserverapi.dto.SecurityVo;
+import com.example.javaserverapi.Encrypt;
+import com.example.javaserverapi.dto.CompanyVo;
+import com.example.javaserverapi.dto.CompanyVoAndSecurityVo;
 import com.example.javaserverapi.error.SecurityError;
 import com.example.javaserverapi.service.SecurityServer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,20 +18,25 @@ public class SecurityController {
     private SecurityError e;
 
     @GetMapping("/checkAccess")
-    public SecurityError check_employee_access(@RequestBody SecurityVo securityVo, @RequestBody EmployeeVo employeeVo){
-        e = server.check_security_level(securityVo,employeeVo);
+    public SecurityError check_employee_access(@RequestBody CompanyVoAndSecurityVo companyVoAndSecurityVo){
+        e = server.check_security_level(companyVoAndSecurityVo);
         return e;
     }
 
     @PostMapping("/addSecurity")
-    public SecurityError add_security_to_employee(@RequestBody SecurityVo securityVo, @RequestBody EmployeeVo employeeVo){
-        e = server.add_security_to_employee(securityVo,employeeVo);
+    public SecurityError add_security_to_employee(@RequestBody CompanyVoAndSecurityVo companyVoAndSecurityVo){
+        e = server.add_security_to_employee(companyVoAndSecurityVo);
         return e;
     }
 
     @PostMapping("/updateSecurity")
-    public SecurityError update_security_to_employee(@RequestBody SecurityVo securityVo, @RequestBody EmployeeVo employeeVo){
-        e = server.update_security_to_employee(securityVo, employeeVo);
+    public SecurityError update_security_to_employee(@RequestBody CompanyVoAndSecurityVo companyVoAndSecurityVo){
+        e = server.update_security_to_employee(companyVoAndSecurityVo);
         return e;
+    }
+
+    @PostMapping("/privateKey")
+    public void getPublicKey(@RequestBody CompanyVo companyVo){
+        Encrypt.generatePrivateKey(companyVo);
     }
 }

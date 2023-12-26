@@ -16,11 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class ImageController {
     private ImageServer server;
     private AppError e;
-    private String imagePath = "D:\\Project\\SecureScan\\pictures\\test.1"; // שינוי הנתיב למיקום התמונה במחשב
+    private final String imagePath = "D:\\Project\\SecureScan\\pictures\\test.1"; // שינוי הנתיב למיקום התמונה במחשב
 
     @PostMapping("/scan")
     public AppError scan_picture(@RequestBody EmployeeVo employeeVo){
         e = server.scanImage(employeeVo, imagePath);
         return e;
     }
+
 }

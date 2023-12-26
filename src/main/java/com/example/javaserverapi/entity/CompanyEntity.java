@@ -22,4 +22,8 @@ public class CompanyEntity {
     @Column(name = "company_id")
     private long company_id;
 
+    @Basic(optional = false)
+    @Column(name = "private_key")
+    private long private_key;
+
 }

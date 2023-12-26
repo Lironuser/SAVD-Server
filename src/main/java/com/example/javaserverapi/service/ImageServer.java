@@ -16,8 +16,6 @@ import java.nio.file.Paths;
 @Service
 public class ImageServer {
 
-    private AppError e;
-
     public AppError scanImage(EmployeeVo employeeVo, String string_image) {
         try {
             //url התחבר לשרת של הפייתון
@@ -64,10 +62,10 @@ public class ImageServer {
 
         } catch (Exception E) {
             E.printStackTrace();
-            return e.EMPLOYEE_NOT_FOUND;
+            return AppError.EMPLOYEE_NOT_FOUND;
         }
 
-        return e.GOOD;
+        return AppError.GOOD;
     }
 
     public static byte[] imageToByteArray(String imagePath) {

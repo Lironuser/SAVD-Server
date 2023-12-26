@@ -1,7 +1,6 @@
 package com.example.javaserverapi.service;
 
-import com.example.javaserverapi.dto.EmployeeVo;
-import com.example.javaserverapi.dto.SecurityVo;
+import com.example.javaserverapi.dto.CompanyVoAndSecurityVo;
 import com.example.javaserverapi.entity.SecurityEntity;
 import com.example.javaserverapi.error.SecurityError;
 import com.example.javaserverapi.repository.SecurityRepository;
@@ -11,66 +10,62 @@ import java.util.Optional;
 
 @Service
 public class SecurityServer {
-    private SecurityError e;
-    private SecurityRepository repository;
+    private static SecurityRepository repository;
 
-    public SecurityError check_security_level(SecurityVo securityVo, EmployeeVo employeeVo) {
+    public SecurityError check_security_level(CompanyVoAndSecurityVo companyVoAndSecurityVo) {
         Optional<SecurityEntity> security;
-        security = repository.haveAccess(employeeVo.getId(), securityVo.getRoom_name());
+        security = repository.haveAccess(companyVoAndSecurityVo.getId(), companyVoAndSecurityVo.getRoom_name());
         if (security.isPresent()) {
-            return e.ACCESS_DENIED;
+            return SecurityError.ACCESS_DENIED;
         }
-        return e.GOOD;
+        return SecurityError.GOOD;
     }
 
-    public SecurityError add_security_to_employee(SecurityVo securityVo, EmployeeVo employeeVo) {
+    public SecurityError add_security_to_employee(CompanyVoAndSecurityVo companyVoAndSecurityVo) {
         long access;
         String room_access;
-        room_access = securityVo.getRoom_name();
-        access = securityVo.getAccess();
+        room_access = companyVoAndSecurityVo.getRoom_name();
+        access = companyVoAndSecurityVo.getAccess();
         Optional<SecurityEntity> securityEntityOptional;
         securityEntityOptional = repository.haveAccess(access, room_access);
         //אם למשתמש יש כבר גישה אז אי אפשר ליצור לו גישה ניתן לפנות לפונקציית העדכון
-        if (!securityEntityOptional.isPresent()) {
-            return e.EMPLOYEE_ALREADY_HAVE_ACCESS;
+        if (securityEntityOptional.isEmpty()) {
+            return SecurityError.ACCESS_DENIED;
         }
-        try {
-            SecurityEntity bean = new SecurityEntity();
-            bean.setRoom_name(securityVo.getRoom_name());
-            bean.setCompany_id(employeeVo.getCompany_id());
-            bean.setAccess(employeeVo.getId());
-            repository.save(bean);
-        } catch (Exception exception) {
-            System.out.println(e);
-            return e.OTHER_ERROR;
+        if (saveSecurity(companyVoAndSecurityVo) == SecurityError.GOOD){
+            return SecurityError.GOOD;
         }
-        return e.GOOD;
+        return SecurityError.OTHER_ERROR;
     }
 
-    public SecurityError update_security_to_employee(SecurityVo securityVo, EmployeeVo employeeVo) {
+    public SecurityError update_security_to_employee(CompanyVoAndSecurityVo companyVoAndSecurityVo) {
         long access;
         String room_access;
-        room_access = securityVo.getRoom_name();
-        access = securityVo.getAccess();
+        room_access = companyVoAndSecurityVo.getRoom_name();
+        access = companyVoAndSecurityVo.getAccess();
         Optional<SecurityEntity> securityEntityOptional;
         securityEntityOptional = repository.haveAccess(access, room_access);
         //האם קיים גישה אז אין צורך
         if (securityEntityOptional.isEmpty()) {
-            return e.HAVE_NO_ACCESS;
+            return SecurityError.HAVE_NO_ACCESS;
         }
-        if (!securityEntityOptional.isPresent()) {
-            try {
-                SecurityEntity bean = new SecurityEntity();
-                bean.setRoom_name(securityVo.getRoom_name());
-                bean.setCompany_id(employeeVo.getCompany_id());
-                bean.setAccess(employeeVo.getId());
-                repository.save(bean);
-            } catch (Exception exception) {
-                System.out.println(e);
-                return e.OTHER_ERROR;
-            }
-            return e.GOOD;
+        if (saveSecurity(companyVoAndSecurityVo) == SecurityError.GOOD){
+            return SecurityError.GOOD;
         }
-        return e.OTHER_ERROR;
+        return SecurityError.OTHER_ERROR;
+    }
+
+    private SecurityError saveSecurity(CompanyVoAndSecurityVo companyVoAndSecurityVo){
+        try {
+            SecurityEntity bean = new SecurityEntity();
+            bean.setRoom_name(companyVoAndSecurityVo.getRoom_name());
+            bean.setCompany_id(companyVoAndSecurityVo.getCompany_id());
+            bean.setAccess(companyVoAndSecurityVo.getId());
+            repository.save(bean);
+        } catch (Exception exception) {
+            System.out.println(exception);
+            return SecurityError.OTHER_ERROR;
+        }
+        return SecurityError.GOOD;
     }
 }
