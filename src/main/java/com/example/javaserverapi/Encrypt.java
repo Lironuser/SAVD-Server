@@ -1,9 +1,10 @@
 package com.example.javaserverapi;
 
 import com.example.javaserverapi.dto.CompanyVo;
-import com.example.javaserverapi.dto.EmployeeVo;
+import com.example.javaserverapi.entity.CompanyEntity;
 import com.example.javaserverapi.entity.EmployeeEntity;
-import com.example.javaserverapi.error.EmployeeError;
+import com.example.javaserverapi.error.SecurityError;
+import com.example.javaserverapi.repository.CompanyRepository;
 import com.example.javaserverapi.repository.EmployeeRepository;
 import org.springframework.beans.BeanUtils;
 
@@ -11,7 +12,8 @@ import java.util.Optional;
 import java.util.Random;
 
 public class Encrypt {
-    private static EmployeeRepository repository;
+    private static EmployeeRepository employee_repository;
+    private static CompanyRepository company_repository;
     public static long generatePrivateKey(CompanyVo companyVo) {
         long c = 0;
         boolean isPrime = false;
@@ -43,19 +45,32 @@ public class Encrypt {
         return true; // המספר הוא מספר ראשוני
     }
 
-    private static EmployeeError savePrivateKey(long comp_id){
+    private static SecurityError savePrivateKey(long comp_id){
         try{
             Optional<EmployeeEntity> employeeEntity;
-            employeeEntity = repository.getEmployeeById(comp_id);
+            employeeEntity = employee_repository.getEmployeeById(comp_id);
             if (employeeEntity.isPresent()){
                 EmployeeEntity bean = new EmployeeEntity();
                 BeanUtils.copyProperties(employeeEntity.get(), bean);
-                repository.save(bean);
+                employee_repository.save(bean);
             }
         }catch (Exception e){
             System.out.println(e);
-            return EmployeeError.NOT_FOUND;
+            return SecurityError.COMPANY_NOT_FOUND;
         }
-        return EmployeeError.GOOD;
+        return SecurityError.GOOD;
+    }
+    public static Long getPrivateKey(long comp_id) {
+        try {
+            Optional<CompanyEntity> companyEntity;
+            companyEntity = company_repository.getCompanyById(comp_id);
+            if (companyEntity.isPresent()) {
+                long pk = companyEntity.get().getPrivate_key();
+                return pk;
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    return 0L;
     }
 }

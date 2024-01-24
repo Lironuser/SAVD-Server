@@ -7,6 +7,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,16 +26,7 @@ public class ImageServer {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             //הגדרת הבקשה
             con.setRequestMethod("POST");
-
-            //הופך תמונה מקובץ טקסט למערך של ביטים
-            byte[] bytes_image = imageToByteArray(string_image);
-
-            if (bytes_image != null) {
-                System.out.println("Picture transfer to byte[] successfully.");
-            } else {
-                System.out.println("Error to transfer picture to byte[].");
-            }
-            employeeVo.setImage(bytes_image);
+            byte[] byte_image = imageToByteArray(string_image);
 
             int status = con.getResponseCode();
             System.out.println("HTTP Status Code: " + status);
@@ -52,9 +45,15 @@ public class ImageServer {
 
                 con.disconnect();
 
-                if (serverInput >= 1){
+                if (serverInput == 1){
                     // המידע מהשרת ב-Python
-                    System.out.println("Server Input (as long): " + serverInput);
+                    System.out.println("Success");
+                    System.out.println(inputLine);
+                    employeeVo.setImage(byte_image);
+
+                }else {
+                    System.out.println("Error!");
+                    System.out.println(inputLine);
                 }
             } else {
                 System.out.println("HTTP Request failed with status: " + status);
@@ -74,10 +73,38 @@ public class ImageServer {
 
         try {
             imageBytes = Files.readAllBytes(path); // קריאת תמונה כמערך של בייטים
+            if (imageBytes != null) {
+                System.out.println("Picture transfer to byte[] successfully.");
+            } else {
+                System.out.println("Error to transfer picture to byte[].");
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return imageBytes;
     }
+
+    public AppError saveImage(){
+        try{
+            //url התחבר לשרת של הפייתון
+            URL url = new URL("http://localhost:8085/path");
+            //יצירת חיבור לשרת הנוסף
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            //הגדרת הבקשה
+            con.setRequestMethod("POST");
+
+            int status = con.getResponseCode();
+            System.out.println("HTTP Status Code: " + status);
+
+            if (status == HttpURLConnection.HTTP_OK) {
+
+            }
+        } catch (Exception E) {
+            E.printStackTrace();
+        }
+        return AppError.GOOD;
+    }
+
+
 }

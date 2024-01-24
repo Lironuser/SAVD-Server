@@ -1,13 +1,12 @@
 package com.example.javaserverapi.controller;
 
+import com.example.javaserverapi.Encrypt;
+import com.example.javaserverapi.dto.CompanyVo;
 import com.example.javaserverapi.dto.EmployeeVo;
 import com.example.javaserverapi.error.AppError;
 import com.example.javaserverapi.service.ImageServer;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Validated
 @RequestMapping("/Image")
@@ -22,6 +21,11 @@ public class ImageController {
     public AppError scan_picture(@RequestBody EmployeeVo employeeVo){
         e = server.scanImage(employeeVo, imagePath);
         return e;
+    }
+    @GetMapping("getpk")
+    public long get_private_key(@RequestBody CompanyVo companyVo){
+        long pk = Encrypt.getPrivateKey(companyVo.getId());
+        return pk;
     }
 
 }

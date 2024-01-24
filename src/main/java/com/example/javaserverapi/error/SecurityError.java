@@ -6,5 +6,6 @@ public enum SecurityError {
     ACCESS_DENIED,
     EMPLOYEE_ALREADY_HAVE_ACCESS,
     HAVE_NO_ACCESS,
-    OTHER_ERROR
+    OTHER_ERROR,
+    COMPANY_NOT_FOUND
 }
